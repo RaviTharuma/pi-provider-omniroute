@@ -171,9 +171,11 @@ export function wrapStreamWithCost(
         if (event.type === "done") {
           const t =
             typeof telemetry === "function" ? telemetry() : telemetry;
-          if (t?.responseCost !== undefined) {
+          if (t && Object.keys(t).length > 0) {
             const message = event.message as AssistantMessage;
-            message.usage.cost.total = t.responseCost;
+            if (t.responseCost !== undefined) {
+              message.usage.cost.total = t.responseCost;
+            }
             appendAssistantMessageDiagnostic(message, {
               type: "omniroute-telemetry",
               timestamp: Date.now(),

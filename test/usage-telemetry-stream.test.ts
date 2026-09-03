@@ -181,6 +181,18 @@ test("wrapStreamWithCost forwards all events in order", async () => {
   assert.deepEqual(types, ["text_start", "done"]);
 });
 
+test("wrapStreamWithCost attaches tok/s without requiring responseCost", async () => {
+  const msg = makeMessage();
+  const src = makeSource([], msg);
+  const out = wrapStreamWithCost(src, { tokensPerSecond: 80.5 });
+  const result = await out.result();
+  assert.equal(result.usage.cost.total, 0);
+  const diag = result.diagnostics!.find((d: any) => d.type === "omniroute-telemetry");
+  assert.ok(diag, "diagnostic attached for tok/s-only telemetry");
+  assert.equal(diag.details!.tokensPerSecond, 80.5);
+  assert.equal(diag.details!.responseCost, undefined);
+});
+
 test("wrapStreamWithCost leaves message alone without telemetry", async () => {
   const msg = makeMessage();
   const src = makeSource([], msg);
