@@ -12,6 +12,8 @@ export interface OmnirouteTelemetry {
   responseCost?: number;
   tokensIn?: number;
   tokensOut?: number;
+  tokensPerSecond?: number;
+  ttftMs?: number;
   model?: string;
   provider?: string;
   cacheHit?: boolean;
@@ -45,6 +47,14 @@ export function parseOmnirouteTelemetryLine(
     case "latency-ms": {
       const n = Number(value);
       return Number.isFinite(n) ? { latencyMs: n } : {};
+    }
+    case "tokens-per-second": {
+      const n = Number(value);
+      return Number.isFinite(n) && n > 0 ? { tokensPerSecond: n } : {};
+    }
+    case "ttft-ms": {
+      const n = Number(value);
+      return Number.isFinite(n) && n > 0 ? { ttftMs: n } : {};
     }
     case "model":
       return { model: value };
@@ -171,6 +181,8 @@ export function wrapStreamWithCost(
                 responseCost: t.responseCost,
                 tokensIn: t.tokensIn,
                 tokensOut: t.tokensOut,
+                tokensPerSecond: t.tokensPerSecond,
+                ttftMs: t.ttftMs,
                 model: t.model,
                 provider: t.provider,
                 cacheHit: t.cacheHit,

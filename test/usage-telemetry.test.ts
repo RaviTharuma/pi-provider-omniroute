@@ -31,6 +31,19 @@ test("parseOmnirouteTelemetryLine parses a full comment line", () => {
     parseOmnirouteTelemetryLine(": x-omniroute-latency-ms=1161"),
     { latencyMs: 1161 },
   );
+  assert.deepEqual(
+    parseOmnirouteTelemetryLine(": x-omniroute-tokens-per-second=80.5"),
+    { tokensPerSecond: 80.5 },
+  );
+  assert.deepEqual(
+    parseOmnirouteTelemetryLine(": x-omniroute-ttft-ms=300"),
+    { ttftMs: 300 },
+  );
+});
+
+test("parseOmnirouteTelemetryLine does not invent tok/s from latency", () => {
+  assert.deepEqual(parseOmnirouteTelemetryLine(": x-omniroute-latency-ms=2000"), { latencyMs: 2000 });
+  assert.deepEqual(parseOmnirouteTelemetryLine(": x-omniroute-tokens-per-second=0"), {});
 });
 
 test("parseOmnirouteTelemetryLine returns null for non-comment lines", () => {
